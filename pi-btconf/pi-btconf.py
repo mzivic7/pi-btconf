@@ -44,7 +44,8 @@ class Bluetooth:
         self.buffer = b""
 
 def run():
-    subprocess.Popen(["rfkill", "unblock", "bluetooth"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)   # enable bluetooth
+    subprocess.Popen(["bluetoothctl", "power", "on"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)   # turn on bluetooth
+    subprocess.Popen(["rfkill", "unblock", "bluetooth"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)   # enable bluetooth
     bluetooth = Bluetooth()
     wlan = []
     set_wlan = "wlan0" ###
@@ -65,12 +66,12 @@ def run():
                 bluetooth.send("WLANs: " + str(wlan).replace("'", "").replace("[", "").replace("]", "") + "\n\r")
             
             if command == "saved":
-            	proc = subprocess.Popen(["wpa_cli", "-i", set_wlan, "list_networks"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE).communicate()
+            	proc = subprocess.Popen(["wpa_cli", "-i", set_wlan, "list_networks"], stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
             	bluetooth.send(proc[0].replace(b"\n", b"\n\r") + b"\n\r") 
             
             if command == "scan":
-                subprocess.Popen(["wpa_cli", "-i", set_wlan, "scan"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
-                proc = subprocess.Popen(["wpa_cli", "-i", set_wlan, "scan_results"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE).communicate()
+                subprocess.Popen(["wpa_cli", "-i", set_wlan, "scan"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                proc = subprocess.Popen(["wpa_cli", "-i", set_wlan, "scan_results"], stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
                 bluetooth.send(proc[0].replace(b"\n", b"\n\r") + b"\n\r") 
             
             if command.split(" ")[0] == "network":
@@ -81,7 +82,7 @@ def run():
                     bluetooth.send("Invalid input" + "\n\r")
             
             if command == "new":
-            	proc = subprocess.Popen(["wpa_cli", "-i", set_wlan, "add_network"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE).communicate()
+            	proc = subprocess.Popen(["wpa_cli", "-i", set_wlan, "add_network"], stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
             	bluetooth.send("Added new network, number:", str(proc)) 
             
             if command.split(" ")[0] == "net":
@@ -94,7 +95,7 @@ def run():
             if command.split(" ")[0] == "ssid":
                 if  len(command.split(" ")) >= 2:
                     set_ssid = command.split(" ")[1]
-                    subprocess.Popen(["wpa_cli", "-i", set_wlan, "set_network",  "ssid", set_ssid], stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+                    subprocess.Popen(["wpa_cli", "-i", set_wlan, "set_network",  "ssid", set_ssid], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                     bluetooth.send("UUID for network " + set_network + " set to:" + str(set_ssid) + "\r")   # return selected ssid
                 else: 
                     bluetooth.send("Invalid input" + "\n\r")
@@ -103,10 +104,10 @@ def run():
                 if  len(command.split(" ")) >= 2:
                     password = command.split(" ")[1]
                     if password == "NONE_PASS":
-                        subprocess.Popen(["wpa_cli", "-i", set_wlan, "set_network",  "key_mgmt", "NONE"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+                        subprocess.Popen(["wpa_cli", "-i", set_wlan, "set_network",  "key_mgmt", "NONE"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                         bluetooth.send("No password set for network " + set_network + "\r")   # return that password is set
                     else:
-                        subprocess.Popen(["wpa_cli", "-i", set_wlan, "set_network",  "psk", password], stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+                        subprocess.Popen(["wpa_cli", "-i", set_wlan, "set_network",  "psk", password], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                         bluetooth.send("Password set for network " + set_network + "\r")   # return that password is set
                 else: 
                     bluetooth.send("Invalid input" + "\n\r")
@@ -114,7 +115,7 @@ def run():
             if command.split(" ")[0] == "connect":
                 if  len(command.split(" ")) >= 2:
                     conn_network = command.split(" ")[1]
-                    subprocess.Popen(["wpa_cli", "-i", set_wlan, "enable_network", conn_network], stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+                    subprocess.Popen(["wpa_cli", "-i", set_wlan, "enable_network", conn_network], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                     bluetooth.send("Connecting to network" + set_network + "\r")   # return that it start connecting
                 else: 
                     bluetooth.send("Invalid input" + "\n\r")
@@ -135,7 +136,7 @@ def run():
             
             if command == "state":
                 for num, command in enumerate(interfaces_get):   # for all interfaces: get theit state
-                    proc = subprocess.Popen(["raspi-config", "nonint",  command], stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE).communicate()
+                    proc = subprocess.Popen(["raspi-config", "nonint",  command], stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
                     if proc[0].decode() == "0\n":   # if state is 0 (for some reason, it is inverted)
                         bluetooth.send(interface_names[num] + " is ON" + "\n\r")   # it is ON
                     else:  # if state is 1
@@ -145,10 +146,10 @@ def run():
                 if command.split(" ")[0] == interface:
                     if  len(command.split(" ")) == 2:
                         if command.split(" ")[1] == "on":   # turn on interface
-                            subprocess.Popen(["raspi-config", "nonint", interfaces_do[num], "0"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+                            subprocess.Popen(["raspi-config", "nonint", interfaces_do[num], "0"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                             bluetooth.send(interface_names[num] + " turned ON" + "\n\r")
                         if command.split(" ")[1] == "off":   # turn off interface
-                            subprocess.Popen(["raspi-config", "nonint", interfaces_do[num], "1"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+                            subprocess.Popen(["raspi-config", "nonint", interfaces_do[num], "1"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                             bluetooth.send(interface_names[num] + " turned OFF" + "\n\r")
                     else:
                         bluetooth.send("Invalid input" + "\n\r")
@@ -156,10 +157,10 @@ def run():
             if command.split(" ")[0] == "boot":
                 if  len(command.split(" ")) == 2:
                     if command.split(" ")[1] == "cli":   # boot to cli
-                        subprocess.Popen(["raspi-config", "nonint", "do_boot_behaviour", "B1"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+                        subprocess.Popen(["raspi-config", "nonint", "do_boot_behaviour", "B1"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                         bluetooth.send("Next boot wil be into CLI" + "\n\r")
                     if command.split(" ")[1] == "de":   # boot to desktop
-                        subprocess.Popen(["raspi-config", "nonint", "do_boot_behaviour", "B3"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+                        subprocess.Popen(["raspi-config", "nonint", "do_boot_behaviour", "B3"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                         bluetooth.send("Next boot wil be into Desktop" + "\n\r")
             
             if command == "help":
