@@ -1,0 +1,11 @@
+[Unit]
+Description=Launcher for pi-btconf
+After=multi-user.target
+
+[Service]
+Type=simple
+Restart=always
+ExecStart=/usr/bin/python3 /usr/local/sbin/pi-btconf-launcher.py
+
+[Install]
+WantedBy=multi-user.target

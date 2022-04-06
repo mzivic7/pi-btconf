@@ -128,11 +128,11 @@ def run():
             
             if command == "shutdown":
                 bluetooth.send("Full shutdown" + "\n\r")
-                subprocess.Popen(["shutdown now"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)   # shutdown device
+                subprocess.Popen(["shutdown", "now"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)   # shutdown device
                 
             if command == "reboot":
                 bluetooth.send("Rebooting" + "\n\r")
-                subprocess.Popen(["reboot"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)   # reboot device
+                subprocess.Popen(["reboot"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)   # reboot device
             
             if command == "state":
                 for num, command in enumerate(interfaces_get):   # for all interfaces: get theit state
