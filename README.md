@@ -4,7 +4,8 @@ Python script used to configure Raspberry Pi wifi connections, toggle interfaces
 ## Installation
 To install run following commands:
 ```git clone https://github.com/mzivic7/py-btconf
-sudo pi-btconf/install.sh```
+sudo pi-btconf/install.sh
+```
 This will install all dependancies and configure service that waits for button double-press.
 
 ## Usage
@@ -25,7 +26,7 @@ There are many apps designed for android bluetooth RFCOMM (like [BlueTerm](https
  - Set WLAN interface
  - Add new network to saved networks
  - Set new network ssid and password
- - Connect to selected network
+ - Connect to selected network and show network status
  - Show IP address
  - Shutdown or reboot device
  - Show interfaces state

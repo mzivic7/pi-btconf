@@ -119,7 +119,10 @@ def run():
                     bluetooth.send("Connecting to network" + set_network + "\r")   # return that it start connecting
                 else: 
                     bluetooth.send("Invalid input" + "\n\r")
-                
+            
+            if command.split(" ")[0] == "status":
+                proc = subprocess.Popen(["wpa_cli", "status"], stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+                bluetooth.send(proc[0].replace(b"\n", b"\n\r") + b"\n\r") 
             
             if command == "ipa":
                 hostname = socket.gethostname()   # find hostname
@@ -173,6 +176,7 @@ def run():
                 bluetooth.send("ssid <str> - Set new network ssid" + "\n\r")
                 bluetooth.send("pass <str> - Set new network password" + "\n\r")
                 bluetooth.send("connect <num> - Connect to selected network" + "\n\r")
+                bluetooth.send("status - Return connection status" + "\n\r")
                 bluetooth.send("ipa - Show IP address" + "\n\r")
                 bluetooth.send("shutdown - Shutdown device now" + "\n\r")
                 bluetooth.send("reboot - Reboot device" + "\n\r")
