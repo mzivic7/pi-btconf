@@ -43,13 +43,25 @@ class Bluetooth:
     def clear_buffer(self):
         self.buffer = b""
 
+# load custom commands from file to dictionary
+def load_custom():
+    custom = open("/etc/pi-btconf/custom_commands.txt")   # open custom commands file
+    custom_text = custom.readlines()   # read custom commands into list of strings
+    custom.close()   # close file
+    command_dict = {}
+    for num, line in enumerate(custom_text):   # for each line
+        line_split = line.replace("\n", "").split(" = ")   # split string to list by " = "
+        command_dict[line_split[0]] = line_split[1].replace('"', '')   # append split line to dictionary
+    return custom_text, command_dict
+
 def run():
-    subprocess.Popen(["bluetoothctl", "power", "on"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)   # turn on bluetooth
-    subprocess.Popen(["rfkill", "unblock", "bluetooth"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)   # enable bluetooth
+    subprocess.Popen("bluetoothctl power on", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)   # turn on bluetooth
+    subprocess.Popen("rfkill unblock bluetooth", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)   # enable bluetooth
     bluetooth = Bluetooth()
     wlan = []
     set_wlan = "wlan0" ###
     set_network = 0
+    custom_text, command_dict = load_custom()
     while True:
         command = bluetooth.receive()   # receive ssid from second device
 
@@ -66,12 +78,12 @@ def run():
                 bluetooth.send("WLANs: " + str(wlan).replace("'", "").replace("[", "").replace("]", "") + "\n\r")
             
             if command == "saved":
-            	proc = subprocess.Popen(["wpa_cli", "-i", set_wlan, "list_networks"], stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
-            	bluetooth.send(proc[0].replace(b"\n", b"\n\r") + b"\n\r") 
+                proc = subprocess.Popen("wpa_cli -i "+set_wlan+" list_networks", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+                bluetooth.send(proc[0].replace(b"\n", b"\n\r") + b"\n\r") 
             
             if command == "scan":
-                subprocess.Popen(["wpa_cli", "-i", set_wlan, "scan"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                proc = subprocess.Popen(["wpa_cli", "-i", set_wlan, "scan_results"], stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+                subprocess.Popen("wpa_cli -i "+set_wlan+" scan", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                proc = subprocess.Popen("wpa_cli -i "+set_wlan+" scan_results", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
                 bluetooth.send(proc[0].replace(b"\n", b"\n\r") + b"\n\r") 
             
             if command.split(" ")[0] == "network":
@@ -82,8 +94,8 @@ def run():
                     bluetooth.send("Invalid input" + "\n\r")
             
             if command == "new":
-            	proc = subprocess.Popen(["wpa_cli", "-i", set_wlan, "add_network"], stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
-            	bluetooth.send("Added new network, number:", str(proc)) 
+                proc = subprocess.Popen("wpa_cli -i "+set_wlan+" add_network", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+                bluetooth.send("Added new network, number:", str(proc)) 
             
             if command.split(" ")[0] == "net":
                 if  len(command.split(" ")) == 2:
@@ -95,7 +107,7 @@ def run():
             if command.split(" ")[0] == "ssid":
                 if  len(command.split(" ")) >= 2:
                     set_ssid = command.split(" ")[1]
-                    subprocess.Popen(["wpa_cli", "-i", set_wlan, "set_network",  "ssid", set_ssid], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    subprocess.Popen("wpa_cli -i "+set_wlan+" set_network ssid "+set_ssid, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                     bluetooth.send("UUID for network " + set_network + " set to:" + str(set_ssid) + "\r")   # return selected ssid
                 else: 
                     bluetooth.send("Invalid input" + "\n\r")
@@ -104,10 +116,10 @@ def run():
                 if  len(command.split(" ")) >= 2:
                     password = command.split(" ")[1]
                     if password == "NONE_PASS":
-                        subprocess.Popen(["wpa_cli", "-i", set_wlan, "set_network",  "key_mgmt", "NONE"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                        subprocess.Popen("wpa_cli -i "+set_wlan+" set_network key_mgmt NONE", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                         bluetooth.send("No password set for network " + set_network + "\r")   # return that password is set
                     else:
-                        subprocess.Popen(["wpa_cli", "-i", set_wlan, "set_network",  "psk", password], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                        subprocess.Popen("wpa_cli -i "+set_wlan+" set_network psk "+password, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                         bluetooth.send("Password set for network " + set_network + "\r")   # return that password is set
                 else: 
                     bluetooth.send("Invalid input" + "\n\r")
@@ -115,13 +127,13 @@ def run():
             if command.split(" ")[0] == "connect":
                 if  len(command.split(" ")) >= 2:
                     conn_network = command.split(" ")[1]
-                    subprocess.Popen(["wpa_cli", "-i", set_wlan, "enable_network", conn_network], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    subprocess.Popen("wpa_cli -i "+set_wlan+" enable_network "+conn_network, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                     bluetooth.send("Connecting to network" + set_network + "\r")   # return that it start connecting
                 else: 
                     bluetooth.send("Invalid input" + "\n\r")
             
             if command.split(" ")[0] == "status":
-                proc = subprocess.Popen(["wpa_cli", "status"], stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+                proc = subprocess.Popen("wpa_cli status", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
                 bluetooth.send(proc[0].replace(b"\n", b"\n\r") + b"\n\r") 
             
             if command == "ipa":
@@ -131,15 +143,15 @@ def run():
             
             if command == "shutdown":
                 bluetooth.send("Full shutdown" + "\n\r")
-                subprocess.Popen(["shutdown", "now"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)   # shutdown device
+                subprocess.Popen("shutdown now", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)   # shutdown device
                 
             if command == "reboot":
                 bluetooth.send("Rebooting" + "\n\r")
-                subprocess.Popen(["reboot"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)   # reboot device
+                subprocess.Popen("reboot", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)   # reboot device
             
             if command == "state":
-                for num, command in enumerate(interfaces_get):   # for all interfaces: get theit state
-                    proc = subprocess.Popen(["raspi-config", "nonint",  command], stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+                for num, command in enumerate(interfaces_get):   # for all interfaces: get their state
+                    proc = subprocess.Popen("raspi-config nonint "+command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
                     if proc[0].decode() == "0\n":   # if state is 0 (for some reason, it is inverted)
                         bluetooth.send(interface_names[num] + " is ON" + "\n\r")   # it is ON
                     else:  # if state is 1
@@ -149,10 +161,10 @@ def run():
                 if command.split(" ")[0] == interface:
                     if  len(command.split(" ")) == 2:
                         if command.split(" ")[1] == "on":   # turn on interface
-                            subprocess.Popen(["raspi-config", "nonint", interfaces_do[num], "0"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                            subprocess.Popen("raspi-config nonint "+interfaces_do[num]+"0", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                             bluetooth.send(interface_names[num] + " turned ON" + "\n\r")
                         if command.split(" ")[1] == "off":   # turn off interface
-                            subprocess.Popen(["raspi-config", "nonint", interfaces_do[num], "1"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                            subprocess.Popen("raspi-config nonint "+interfaces_do[num]+"1", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                             bluetooth.send(interface_names[num] + " turned OFF" + "\n\r")
                     else:
                         bluetooth.send("Invalid input" + "\n\r")
@@ -160,11 +172,21 @@ def run():
             if command.split(" ")[0] == "boot":
                 if  len(command.split(" ")) == 2:
                     if command.split(" ")[1] == "cli":   # boot to cli
-                        subprocess.Popen(["raspi-config", "nonint", "do_boot_behaviour", "B1"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                        bluetooth.send("Next boot wil be into CLI" + "\n\r")
+                        subprocess.Popen("raspi-config nonint do_boot_behaviour B1", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                        bluetooth.send("Next boot will be into CLI" + "\n\r")
                     if command.split(" ")[1] == "de":   # boot to desktop
-                        subprocess.Popen(["raspi-config", "nonint", "do_boot_behaviour", "B3"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                        bluetooth.send("Next boot wil be into Desktop" + "\n\r")
+                        subprocess.Popen("raspi-config nonint do_boot_behaviour B3", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                        bluetooth.send("Next boot will be into Desktop" + "\n\r")
+            
+            if custom_text != []:
+                if command == "custom":
+                    for line in custom_text:   # for each line
+                        bluetooth.send(line + "\n\r")   # add newline and send it
+                
+                if command in command_dict["Name"]:
+                    command_run = command_dict[command]   # get command from dictionary by name
+                    proc = subprocess.Popen(command_run, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+                    bluetooth.send(proc[0].replace(b"\n", b"\n\r") + b"\n\r") 
             
             if command == "help":
                 bluetooth.send("list - List available WLAN interfaces" + "\n\r")
@@ -183,12 +205,13 @@ def run():
                 bluetooth.send("state - Show interfaces state" + "\n\r")
                 bluetooth.send("<interface> <on/off> - Enable / Disable interface" + "\n\r")
                 bluetooth.send("boot <cli/de> - Boot into CLI / Desktop" + "\n\r")
+                bluetooth.send("custom - List available custom commands" + "\n\r")
                 bluetooth.send("quit - End session and disable bluetooth" + "\n\r")
                 
             if command == "quit":
                 break
 
-    subprocess.Popen(["rfkill", "block", "bluetooth"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)   # disable bluetooth
+    subprocess.Popen("rfkill block bluetooth", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)   # disable bluetooth
 
 run()
 

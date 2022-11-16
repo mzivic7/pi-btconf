@@ -1,9 +1,10 @@
 # Config over Bluetooth for Raspberry Pi
-Python script used to configure Raspberry Pi wifi connections, toggle interfaces and many more.
+Python script used to configure Raspberry Pi wifi connections, toggle interfaces and much more.
 
 ## Installation
-To install run following commands:
-```git clone https://github.com/mzivic7/py-btconf
+To install, run following commands:
+```
+git clone https://github.com/mzivic7/py-btconf
 sudo pi-btconf/install.sh
 ```
 This will install all dependancies and configure service that waits for button double-press.
@@ -16,11 +17,11 @@ Pi-btconf will turn on bluetooth if it is off.
 
 On second device any terminal that communicates over bluetooth RFCOMM protocol will work.
 There are many apps designed for android bluetooth RFCOMM (like [BlueTerm](https://play.google.com/store/apps/details?id=es.pymasde.blueterm)).
-"terminal" function will work only with suitable terminal emulator on second device (for android, advised: [rfterm](https://github.com/hxxr/rfterm)) 
+"terminal" function will work only with suitable terminal emulator on second device (for android, example: [rfterm](https://github.com/hxxr/rfterm)).
 
 ## Features:
- - Swich on / off script and bluetooth on button bouble-press
- - Run terminal
+ - Swich on / off script and bluetooth on button double-press
+ - Run terminal (WIP)
  - List saved networks
  - Scan for available networks
  - Set WLAN interface
@@ -32,4 +33,12 @@ There are many apps designed for android bluetooth RFCOMM (like [BlueTerm](https
  - Show interfaces state
  - Enable / Disable interfaces
  - Next boot into CLI / Desktop
+ - Run pre-set custom command in terminal
  - End session and disable bluetooth
+
+## Custom Commands:
+Custom commands can be added and edited in: /etc/pi-btconf/custom_comands.txt
+Format:  
+name = "command to run in terminal"  
+Each line represents one command.
+There must be " = " separator and command must be inside "".
