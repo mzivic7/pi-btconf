@@ -9,7 +9,7 @@ Button.pressed_time = None   # when the button is pressed
 Button.running = False   # is pi-btconf script running
 Button.script = None   # scrpit subprocess object
 
-subprocess.Popen(["rfkill", "block", "bluetooth"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)  # disable bluetooth at boot
+subprocess.Popen("rfkill block bluetooth", shell=True)  # disable bluetooth at boot
 
 def pressed(btn):
     if btn.pressed_time:   # if button is already pressed once
@@ -21,7 +21,7 @@ def pressed(btn):
                 else:   # if script is to be terminated:
                     if btn.script.poll() is None:   # if script is still running:
                         btn.script.terminate()   # terminate script and disable bluetooth
-                        subprocess.Popen(["rfkill", "block", "bluetooth"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                        subprocess.Popen("rfkill block bluetooth", shell=True)
                     else:   # if script has already been terminated
                         btn.script = subprocess.Popen(['/usr/bin/python3', '/usr/local/sbin/pi-btconf.py'])   # run script again
                         btn.running = True   # set script state to running

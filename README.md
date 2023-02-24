@@ -12,16 +12,15 @@ This will install all dependancies and configure service that waits for button d
 ## Usage
 Pair raspberry pi with second device.
 Connect button to GPIO pin 3 and gnd.
-To start pi-btconf, push button twice under 0.5 seconds. This will also terminate pi-btconf if it is previously started.
+To start pi-btconf, push button twice under 0.5 seconds. This will also terminate pi-btconf if it is previously started and turn off bluetooth.
 Pi-btconf will turn on bluetooth if it is off.
 
 On second device any terminal that communicates over bluetooth RFCOMM protocol will work.
 There are many apps designed for android bluetooth RFCOMM (like [BlueTerm](https://play.google.com/store/apps/details?id=es.pymasde.blueterm)).
-"terminal" function will work only with suitable terminal emulator on second device (for android, example: [rfterm](https://github.com/hxxr/rfterm)).
 
 ## Features:
  - Swich on / off script and bluetooth on button double-press
- - Run terminal (WIP)
+ - Setup terminal over bluetooth RFCOMM
  - List saved networks
  - Scan for available networks
  - Set WLAN interface
@@ -36,9 +35,16 @@ There are many apps designed for android bluetooth RFCOMM (like [BlueTerm](https
  - Run pre-set custom command in terminal
  - End session and disable bluetooth
 
+## Terminal:
+
+Terminal function will work with any RFCOMM terminal on second device. 
+On android, BlueTerm will work, but it may lack some important functons, like special keys and colors. (better: [rfterm](https://github.com/hxxr/rfterm)).  
+When terminal is activated pi-btconf won't be able to connect.  
+Pressing button twice will turn off bluetooth and disconnect terminal.
+
 ## Custom Commands:
-Custom commands can be added and edited in: /etc/pi-btconf/custom_comands.txt
+Custom commands can be configured in: /etc/pi-btconf/custom_comands.txt  
 Format:  
 name = "command to run in terminal"  
-Each line represents one command.
+Each line represents one command.  
 There must be " = " separator and command must be inside "".
