@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # install packages and libs
-sudo apt install bluetooth bluez python-bluetooth libbluetooth-dev
+sudo apt install bluez
 sudo pip3 install pybluez
 
 # install files
@@ -19,7 +19,7 @@ sudo chown root:root /etc/systemd/system/pi-btconf.service /usr/local/sbin/pi-bt
 sudo systemctl enable pi-btconf.service
 sudo systemctl start pi-btconf.service
 
-echo "pi-btnap service is enabled and started." 
+echo "pi-btconf service is enabled and started." 
 echo "Please reboot RPi, connect button to gpio pin 3 (default) and ground, and have RPi and second device paired."
 echo "To activate pi-btconf quickly push button twice. On second device open bluetooth RFCOMM terminal and connect to RPi."
 

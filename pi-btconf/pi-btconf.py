@@ -215,7 +215,7 @@ def run():
                     else:
                         bluetooth.send("There are no available custom commands" + "\n\r")
                 
-                if command in command_dict["Name"]:
+                if command in command_dict.keys():
                     command_run = command_dict[command]   # get command from dictionary by name
                     proc = subprocess.Popen(command_run, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
                     bluetooth.send(proc[0].replace(b"\n", b"\n\r") + b"\n\r")   # return output if any
