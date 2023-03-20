@@ -101,6 +101,7 @@ def run():
                             wlan.append(net_interface)
                     if command.split(" ")[1] in wlan:   # check if inputed interface exists
                         set_wlan = command.split(" ")[1]
+                        bluetooth.send("Network interface set to:" + str(set_wlan) + "\n\r")
                     else:
                         bluetooth.send("Invalid network interface" + "\n\r")
                 else: 
@@ -114,13 +115,6 @@ def run():
                 subprocess.Popen("wpa_cli -i "+set_wlan+" scan", shell=True)
                 proc = subprocess.Popen("wpa_cli -i "+set_wlan+" scan_results", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
                 bluetooth.send(proc[0].replace(b"\n", b"\n\r") + b"\n\r") 
-            
-            if command.split(" ")[0] == "network":
-                if  len(command.split(" ")) == 2:   # if there is 2 words
-                    set_wlan = command.split(" ")[1]   # get second word
-                    bluetooth.send("Network interface set to:" + str(set_wlan) + "\n\r")   # return selected wlan
-                else: 
-                    bluetooth.send("Invalid input" + "\n\r")
             
             if command == "new":
                 proc = subprocess.Popen("wpa_cli -i "+set_wlan+" add_network", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
@@ -156,7 +150,7 @@ def run():
             if command.split(" ")[0] == "connect":
                 if  len(command.split(" ")) >= 2:
                     conn_network = command.split(" ")[1]
-                    subprocess.Popen("wpa_cli -i "+set_wlan+" enable_network "+conn_network, shell=True)
+                    subprocess.Popen("wpa_cli -i "+set_wlan+" select_network "+conn_network, shell=True)
                     bluetooth.send("Connecting to network" + set_network + "\r")   # return that it start connecting
                 else: 
                     bluetooth.send("Invalid input" + "\n\r")

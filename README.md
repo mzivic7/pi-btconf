@@ -5,17 +5,19 @@ Python script used to configure Raspberry Pi wifi connections, toggle interfaces
 To install, run following commands:
 ```
 git clone https://github.com/mzivic7/pi-btconf.git
-sudo pi-btconf/install.sh
+cd pi-btconf
+sudo install.sh
 ```
 This will install all dependancies and configure service that waits for button input.
 
 ## Usage
 Pair raspberry pi with second device.
-Connect button to GPIO pin 3 and gnd (can be changed).
-To start pi-btconf, push button twice under 0.5 seconds. This will also terminate pi-btconf if it is active and turn off bluetooth.
-Pi-btconf will turn on bluetooth if it is off.
+Connect button to GPIO pin 3 and gnd (can be changed).  
+To start pi-btconf, push button twice under 0.5 seconds. This will also terminate pi-btconf if it is active and turn off bluetooth.  
+Pi-btconf will turn on bluetooth if it is off.  
+Default network manager (dhcpcd) is required in order for network configuratin to work.  
 
-On second device any terminal that communicates over bluetooth RFCOMM protocol will work.
+On second device any terminal that communicates over bluetooth RFCOMM protocol will work.  
 There are many apps designed for android bluetooth RFCOMM (like [BlueTerm](https://play.google.com/store/apps/details?id=es.pymasde.blueterm)).
 
 ## Features
