@@ -101,7 +101,7 @@ def run():
                             wlan.append(net_interface)
                     if command.split(" ")[1] in wlan:   # check if inputed interface exists
                         set_wlan = command.split(" ")[1]
-                        bluetooth.send("Network interface set to:" + str(set_wlan) + "\n\r")
+                        bluetooth.send("Network interface set to:" + set_wlan + "\n\r")
                     else:
                         bluetooth.send("Invalid network interface" + "\n\r")
                 else: 
@@ -118,20 +118,20 @@ def run():
             
             if command == "new":
                 proc = subprocess.Popen("wpa_cli -i "+set_wlan+" add_network", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
-                bluetooth.send("Added new network, number:", str(proc)) 
+                bluetooth.send("Added new network, number:" + str(proc[0].replace(b"\n", b"\n\r")) + b"\n\r") 
             
             if command.split(" ")[0] == "net":
                 if  len(command.split(" ")) == 2:
                     set_network = command.split(" ")[1]
-                    bluetooth.send("Selected network number " + set_network + "\n\r")
+                    bluetooth.send("Selected network number " + str(set_network)  + "\n\r")
                 else: 
                     bluetooth.send("Invalid input" + "\n\r")
             
             if command.split(" ")[0] == "ssid":
                 if  len(command.split(" ")) >= 2:
                     set_ssid = command.split(" ")[1]
-                    subprocess.Popen("wpa_cli -i "+set_wlan+" set_network ssid "+set_ssid, shell=True)
-                    bluetooth.send("UUID for network " + set_network + " set to:" + str(set_ssid) + "\r")   # return selected ssid
+                    subprocess.Popen("wpa_cli -i "+set_wlan+" set_network " + str(set_network) + " ssid "+set_ssid, shell=True)
+                    bluetooth.send("UUID for network " + str(set_network) + " set to:" + str(set_ssid) + "\n\r")   # return selected ssid
                 else: 
                     bluetooth.send("Invalid input" + "\n\r")
             
@@ -139,19 +139,19 @@ def run():
                 if  len(command.split(" ")) >= 2:
                     password = command.split(" ")[1]
                     if password == "NONE_PASS":
-                        subprocess.Popen("wpa_cli -i "+set_wlan+" set_network key_mgmt NONE", shell=True)
-                        bluetooth.send("No password set for network " + set_network + "\r")   # return that password is set
+                        subprocess.Popen("wpa_cli -i "+set_wlan+" set_network " + str(set_network) + " key_mgmt NONE", shell=True)
+                        bluetooth.send("No password set for network " + str(set_network) + "\n\r")   # return that password is set
                     else:
-                        subprocess.Popen("wpa_cli -i "+set_wlan+" set_network psk "+password, shell=True)
-                        bluetooth.send("Password set for network " + set_network + "\r")   # return that password is set
+                        subprocess.Popen("wpa_cli -i "+set_wlan+" set_network " + str(set_network) + " psk "+password, shell=True)
+                        bluetooth.send("Password set for network " + str(set_network) + "\n\r")   # return that password is set
                 else: 
                     bluetooth.send("Invalid input" + "\n\r")
             
             if command.split(" ")[0] == "connect":
                 if  len(command.split(" ")) >= 2:
                     conn_network = command.split(" ")[1]
-                    subprocess.Popen("wpa_cli -i "+set_wlan+" select_network "+conn_network, shell=True)
-                    bluetooth.send("Connecting to network" + set_network + "\r")   # return that it start connecting
+                    subprocess.Popen("wpa_cli -i "+set_wlan+" select_network " + str(conn_network), shell=True)
+                    bluetooth.send("Connecting to network " + str(conn_network) + "\n\r")   # return that it start connecting
                 else: 
                     bluetooth.send("Invalid input" + "\n\r")
             

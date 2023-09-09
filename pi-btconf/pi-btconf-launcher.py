@@ -19,7 +19,7 @@ def pressed(btn):
 def released(btn):
     if btn.pressed_time + timedelta(seconds=hold_s) > datetime.now():   # if button is released after less than n seconds
         if btn.released_time:   # if button is already pressed once
-            if btn.released_time + timedelta(seconds=0.5) > datetime.now():   # if new time is 0.5s greater than previous
+            if btn.released_time + timedelta(seconds=0.5) > datetime.now():   # if new time is 0.5s smaller than previous
                 if btn.released_time + timedelta(seconds=0.05) < datetime.now():   # if button is not too fast pressed
                     btn.running = not btn.running   # invert script running state
                     if btn.running is True:   # if script is to be running:
@@ -38,7 +38,7 @@ def released(btn):
                 btn.released_time = datetime.now()   # save button released time
         else:   # if button is not pressed before
             btn.released_time = datetime.now()   # save button released time
-    else:   # if button is released afte more than 6 seconds
+    else:   # if button is released after more than n seconds
         subprocess.Popen("shutdown now", shell=True)   # shutdown device
 
 
