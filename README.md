@@ -8,7 +8,11 @@ git clone https://github.com/mzivic7/pi-btconf.git
 cd pi-btconf
 sudo install.sh
 ```
-This will install all dependancies and configure service that waits for button input.
+This will install all dependencies and configure service that waits for button input.  
+There are 2 modes of working, select one depending on client apk you are using:  
+ - Default - client apk sends and receives string as command
+ - Legacy - client apk sends and receives each character as they are typed (BlueTerm)  
+To install legacy mode run: `sudo install.sh legacy`
 
 ## Usage
 Pair raspberry pi with second device.
@@ -18,7 +22,7 @@ Pi-btconf will turn on bluetooth if it is off.
 Default network manager (dhcpcd) is required in order for network configuratin to work.  
 
 On second device any terminal that communicates over bluetooth RFCOMM protocol will work.  
-There are many apps designed for android bluetooth RFCOMM (like [BlueTerm](https://play.google.com/store/apps/details?id=es.pymasde.blueterm)).
+There are many apps designed for android bluetooth RFCOMM (like [BlueTerm](https://play.google.com/store/apps/details?id=es.pymasde.blueterm) - uses legacy mode).
 
 ## Features
  - Swich on / off script and bluetooth on button double-press

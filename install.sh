@@ -1,11 +1,18 @@
 #!/bin/bash
 
+legacy="$1"
+
 # install packages and libs
 sudo apt install bluez
 sudo pip3 install pybluez
 
 # install files
+if [ "$legacy" == "legacy" ]
+then
+sudo cp pi-btconf/pi-btconf-legacy.py /usr/local/sbin/pi-btconf.py
+else
 sudo cp pi-btconf/pi-btconf.py /usr/local/sbin/pi-btconf.py
+fi
 sudo cp pi-btconf/pi-btconf-launcher.py /usr/local/sbin/pi-btconf-launcher.py
 sudo cp pi-btconf/pi-btconf.service /etc/systemd/system/pi-btconf.service
 sudo mkdir /etc/pi-btconf/

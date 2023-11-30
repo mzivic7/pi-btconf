@@ -16,7 +16,7 @@ class Bluetooth:
     def __init__(self):
         self.server = bluetooth.BluetoothSocket( bluetooth.RFCOMM )
         port = 1
-        recv_size = 2048
+        recv_size = 1024
         self.server.bind(("",port))
         self.server.listen(1)
         self.client, address = self.server.accept()
@@ -24,12 +24,24 @@ class Bluetooth:
 
 
     def receive(self):
-        """Receive string"""
+        """Receiving one character"""
         data = self.client.recv(recv_size)
+        self.client.send(data)   # send back data to show it
         if len(data):
-            return data.decode()
-        else:
-            return None
+            if data != b'\n':
+                self.buffer += data
+            else:
+                self.client.send(b"\r")   # go to start of newline
+                if len(self.buffer):
+                    return self.buffer.decode()
+                else:
+                    return None
+        return None
+
+
+    def clear_buffer(self):
+        """Clear buffer after it is outputted, used when receiving one character"""
+        self.buffer = b""
 
 
     def send(self, data):
@@ -65,6 +77,7 @@ def run():
         command = bluetooth.receive()   # receive ssid from second device
 
         if command != "":
+            bluetooth.clear_buffer()
 
             if command == "terminal":
                 bluetooth.send("pi-btconf will be disconnected" + "\n\r")
