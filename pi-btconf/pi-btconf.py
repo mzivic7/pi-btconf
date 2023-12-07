@@ -16,7 +16,7 @@ class Bluetooth:
     def __init__(self):
         self.server = bluetooth.BluetoothSocket( bluetooth.RFCOMM )
         port = 1
-        recv_size = 2048
+        self.recv_size = 2048
         self.server.bind(("",port))
         self.server.listen(1)
         self.client, address = self.server.accept()
@@ -25,7 +25,7 @@ class Bluetooth:
 
     def receive(self):
         """Receive string"""
-        data = self.client.recv(recv_size)
+        data = self.client.recv(self.recv_size)
         if len(data):
             return data.decode()
         else:
